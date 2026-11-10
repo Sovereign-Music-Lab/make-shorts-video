@@ -74,6 +74,7 @@ One command runs the whole routine: `./mkshort make <name> --topic "..."`.
 |---|---|
 | `mkmv`, `tools/mkmv.py` | CLI: new, analyze, lyrics, plan, clips, stills, render, studio, make, doctor |
 | `tools/mv_analyze.py` | BPM (comb autocorrelation), beat grid, energy + low/mid/high per video frame, beat-aligned section draft |
+| `tools/ai_generate.py` | Runs FastVideo's MLX script with a tiled TAEHV decode (the stock full-frame decode runs out of memory on 24 GB). Env `MKMV_AI_TILE` (default 20), `MKMV_AI_OVERLAP` (8). |
 | `tools/upscale.sh` | 720p-class → 1920x1080 (ffmpeg Lanczos + sharpen, center crop) |
 | `tools/demo_song.py` | Code-synthesized 120 BPM demo song for tests |
 | `template/mv/` | Remotion project: `src/MV.tsx` renders `data/mv.json` + `data/analysis.json`, audio `public/song.wav` |

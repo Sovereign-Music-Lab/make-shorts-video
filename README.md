@@ -53,7 +53,9 @@ cd make-shorts-video
 
 - 모두 `ai/` 폴더에 설치됩니다 (git 제외). 디스크 여유가 모자라면 받기 전에 멈춥니다.
 - 1280×704 실사 클립(5초)을 만들고 `ffmpeg`로 1920×1080 업스케일합니다.
-- 공개 자료 기준 720p 생성 피크 메모리 약 9 GB, 5초 클립 수 분 (기기마다 다름). 24 GB Mac에서는 큰 Ollama 모델을 `ollama stop` 으로 내리고 생성하세요.
+- 실측 (MacBook Pro M5 Pro 24 GB): 5초 클립 1개 약 1분 50초 (프롬프트 인코딩 30초 + 디노이즈 92초 + 디코딩 8초), 피크 메모리 약 11.4 GB.
+  디코딩은 `tools/ai_generate.py` 가 타일로 나눠 처리합니다 (원본 스크립트는 24 GB에서 메모리 부족으로 실패).
+- 생성 전에 큰 Ollama 모델은 `ollama stop <모델>` 로 내리세요.
 - 이 엔진 없이도 뮤직비디오(모션그래픽)는 만들 수 있습니다.
 
 ---
@@ -214,6 +216,7 @@ cd .. && rm -rf make-shorts-video      # 폴더째 완전 삭제
 | 증상 | 해결 |
 |---|---|
 | `delayRender ... timeout` | 메모리 부족. 큰 Ollama 모델이 올라가 있으면 `ollama stop <모델>` 후 다시 렌더 |
+| `./mkmv clips` 중 `Insufficient Memory` | `ollama ps` 로 올라간 모델을 내리고 다른 큰 앱을 닫기. 그래도 나면 `MKMV_AI_TILE=16 ./mkmv clips <n>` (디코딩 타일 축소) |
 | 나레이션 합성 실패 | edge-tts는 인터넷이 필요합니다. 네트워크 확인 후 `./mkshort voice <n>` |
 | `Ollama 모델 '…'이 없습니다` | `ollama pull <모델>` 또는 `--model` 로 설치된 모델 지정 (`ollama list`) |
 | 한글이 네모로 보임 (Linux) | `sudo apt install -y fonts-noto-cjk` |

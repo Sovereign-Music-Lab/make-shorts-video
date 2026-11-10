@@ -237,7 +237,8 @@ def cmd_clips(a):
         fhd = p / "public" / "clips" / f"s{i}.mp4"
         say(f"AI 클립 [{i}] 720p 생성: {s['prompt'][:80]}")
         t0 = time.time()
-        run([AI_PY, AI_SCRIPT, "--mlx-checkpoint", AI_MODEL, "--text-encoder-root", AI_MODEL, "--vae-root", AI_MODEL / "vae",
+        # tools/ai_generate.py = the FastVideo script with a tiled decode (the stock one runs out of memory on 24 GB)
+        run([AI_PY, TOOLS / "ai_generate.py", AI_SCRIPT, "--mlx-checkpoint", AI_MODEL, "--text-encoder-root", AI_MODEL, "--vae-root", AI_MODEL / "vae",
              "--prompt", s["prompt"], "--height", "704", "--width", "1280", "--num-frames", str(a.frames), "--fps", "24",
              "--seed", str(a.seed + i), "--output-path", raw], cwd=AI / "FastVideo")
         print(f"  생성 {time.time() - t0:.0f}s")
