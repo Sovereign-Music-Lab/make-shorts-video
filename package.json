@@ -1,0 +1,25 @@
+{
+  "name": "make-shorts-video",
+  "private": true,
+  "type": "module",
+  "description": "Korean fact Shorts (and music videos) rendered locally with Remotion, edge-tts narration and synthesized music.",
+  "scripts": {
+    "doctor": "./mkshort doctor",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.541",
+    "@remotion/cli": "4.0.541",
+    "@remotion/renderer": "4.0.541",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.541"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

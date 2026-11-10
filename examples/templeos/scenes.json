@@ -1,0 +1,22 @@
+{
+ "title": "TempleOS",
+ "theme": "sacred",
+ "mood": "sacred",
+ "captions": true,
+ "scenes": [
+  { "type": "title", "line": 1, "kicker": "신의 계시?", "title": "TempleOS", "subtitle": "한 사람이 만든 운영체제", "icon": "temple" },
+  { "type": "person", "line": 2, "role": "프로그래머", "name": "테리 A. 데이비스", "years": "1969 — 2018", "note": "위스콘신 출생 · 오리건에서 사망" },
+  { "type": "timeline", "line": 4, "title": "이름의 역사", "points": [
+    { "year": "2005", "label": "J 운영체제" },
+    { "year": "이후", "label": "LoseThos · SparrowOS" },
+    { "year": "2013", "label": "TempleOS" }
+  ], "source": "Wikipedia: TempleOS" },
+  { "type": "statement", "line": 6, "text": "세 번째 성전", "sub": "데이비스의 주장" },
+  { "type": "chips", "line": 7, "title": "신이 정했다는 사양", "items": ["640 × 480", "16색", "단일 음색"], "source": "Wikipedia: TempleOS" },
+  { "type": "compare", "line": 9, "title": "프로그래밍 언어", "left": { "title": "C+", "text": "처음 이름" }, "right": { "title": "HolyC", "text": "C와 C++ 사이" }, "source": "Wikipedia: HolyC" },
+  { "type": "code", "line": 10, "code": "U0 Main()\n{\n  Print(\"Hello, World!\\n\");\n}", "caption": "컴파일러 · 에디터 · 커널 · 인터넷 없음" },
+  { "type": "number", "line": 11, "value": 100000, "suffix": "+", "label": "코드 줄 수", "source": "Wikipedia: TempleOS" },
+  { "type": "statement", "line": 12, "text": "v5.03", "sub": "2017년 11월 · 소스 공개" },
+  { "type": "ending", "line": 13, "title": "TempleOS", "subtitle": "테리 A. 데이비스 · 1969–2018", "icon": "temple" }
+ ]
+}

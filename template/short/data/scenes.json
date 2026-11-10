@@ -1,0 +1,10 @@
+{
+ "title": "제목",
+ "theme": "sacred",
+ "mood": "sacred",
+ "captions": true,
+ "scenes": [
+  { "type": "title", "line": 1, "kicker": "작은 머리말", "title": "제목", "subtitle": "부제", "icon": "none" },
+  { "type": "ending", "line": 2, "title": "마무리", "subtitle": "출처 · 날짜" }
+ ]
+}

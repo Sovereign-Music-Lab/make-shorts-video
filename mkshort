@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# mkshort wrapper: runs tools/mkshort.py with the repo's own Python venv (.venv, created by install.sh).
+set -euo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PY="$HERE/.venv/bin/python"
+if [ ! -x "$PY" ]; then
+  echo "설치가 안 되어 있습니다. 먼저 ./install.sh 를 실행하세요." >&2
+  exit 1
+fi
+exec "$PY" "$HERE/tools/mkshort.py" "$@"

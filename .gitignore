@@ -1,0 +1,22 @@
+# dependencies and local environments
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# your own videos live here (not committed)
+projects/*
+!projects/.gitkeep
+
+# generated media
+out/
+*.mp4
+*.mov
+*.wav
+*.mp3
+*.aiff
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
