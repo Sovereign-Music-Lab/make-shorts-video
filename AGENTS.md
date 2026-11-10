@@ -68,3 +68,29 @@ One command runs the whole routine: `./mkshort make <name> --topic "..."`.
   - `ending` {title, subtitle, icon}
   - any scene: `source` (short source name shown at the bottom)
 - On-screen text stays short (about 12 characters per row). The narration carries the detail.
+
+## Music videos (`./mkmv`, 1920x1080)
+| Path | Purpose |
+|---|---|
+| `mkmv`, `tools/mkmv.py` | CLI: new, analyze, lyrics, plan, clips, stills, render, studio, make, doctor |
+| `tools/mv_analyze.py` | BPM (comb autocorrelation), beat grid, energy + low/mid/high per video frame, beat-aligned section draft |
+| `tools/upscale.sh` | 720p-class → 1920x1080 (ffmpeg Lanczos + sharpen, center crop) |
+| `tools/demo_song.py` | Code-synthesized 120 BPM demo song for tests |
+| `template/mv/` | Remotion project: `src/MV.tsx` renders `data/mv.json` + `data/analysis.json`, audio `public/song.wav` |
+| `install_ai.sh`, `ai/` | Optional local AI clips (FastMetal-5B-QAD on MLX, Apple Silicon). `ai/` is git-ignored. |
+
+Workflow: `./mkmv new <n> --song <file>` → (`lyrics`) → `plan` → (`clips`) → `stills` → `render --draft` → `render`.
+
+`data/mv.json`:
+```json
+{ "title": "…", "artist": "…", "theme": "neon", "credits": ["Music: …"],
+  "lyrics": [{ "t": 12.5, "end": 15.0, "text": "…" }],
+  "sections": [{ "start": 0, "end": 8.5, "kind": "title" },
+               { "start": 8.5, "end": 16.4, "kind": "clip", "prompt": "photorealistic, cinematic …", "clip": "clips/s1.mp4", "clipSeconds": 5.04 }] }
+```
+- Section kinds: title | visualizer | pulse | lyrics | text {text, sub} | clip {prompt, clip, clipSeconds} | credits.
+- Themes: neon | gold | mono | sunset. Keep section start/end on the beat grid (they come from the analysis).
+- A `clip` section without a `clip` file renders as `pulse`, so a video always renders.
+- AI clip prompts: English, one 5 s shot, no real people, celebrities, logos, violence or sexual content.
+- Before `./mkmv clips` on a 24 GB Mac, unload big Ollama models (`ollama ps`, `ollama stop <model>`).
+- Never use a song the user has no rights to; the user supplies their own audio.

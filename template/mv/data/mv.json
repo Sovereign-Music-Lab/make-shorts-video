@@ -1,0 +1,11 @@
+{
+ "title": "곡 제목",
+ "artist": "아티스트",
+ "theme": "neon",
+ "credits": ["Music: 아티스트", "Video: make-shorts-video"],
+ "lyrics": [],
+ "sections": [
+  { "start": 0, "end": 2, "kind": "title" },
+  { "start": 2, "end": 4, "kind": "credits" }
+ ]
+}

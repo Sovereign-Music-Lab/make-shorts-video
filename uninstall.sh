@@ -7,6 +7,7 @@
 #   ./uninstall.sh                          # remove node_modules/ and .venv/
 #   ./uninstall.sh --projects               # also delete projects/ (your videos)
 #   ./uninstall.sh --ollama-model <name>    # also `ollama rm <name>`
+#   ./uninstall.sh --ai                     # also remove the local AI video engine (ai/, ~22 GB) and its prompt cache
 #   ./uninstall.sh --yes                    # no questions
 # To remove everything afterwards:  cd .. && rm -rf make-shorts-video
 set -euo pipefail
@@ -14,11 +15,13 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 YES=0
 PROJ=0
+AIENG=0
 OLLAMA_MODEL=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --yes|-y) YES=1 ;;
     --projects) PROJ=1 ;;
+    --ai) AIENG=1 ;;
     --ollama-model) OLLAMA_MODEL="${2:?model name}"; shift ;;
     -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
     *) echo "알 수 없는 옵션: $1" >&2; exit 1 ;;
@@ -30,6 +33,7 @@ ask() { [ "$YES" = 1 ] && return 0; read -r -p "$1 [y/N] " a; [ "$a" = y ] || [ 
 echo "삭제 대상:"
 for d in node_modules .venv; do [ -e "$d" ] && echo "  $d/ ($(du -sh "$d" 2>/dev/null | cut -f1))"; done
 [ "$PROJ" = 1 ] && [ -d projects ] && echo "  projects/ ($(du -sh projects 2>/dev/null | cut -f1)) — 만든 영상 포함, 되돌릴 수 없음"
+[ "$AIENG" = 1 ] && [ -d ai ] && echo "  ai/ ($(du -sh ai 2>/dev/null | cut -f1)) — AI 영상 엔진 코드·환경·모델"
 [ -n "$OLLAMA_MODEL" ] && echo "  Ollama 모델 $OLLAMA_MODEL"
 
 ask "진행할까요?" || { echo "취소했습니다."; exit 0; }
@@ -41,6 +45,11 @@ echo "✓ node_modules/, .venv/ 삭제"
 if [ "$PROJ" = 1 ] && [ -d projects ]; then
   find projects -mindepth 1 -maxdepth 1 ! -name .gitkeep -exec rm -rf {} +
   echo "✓ projects/ 비움"
+fi
+
+if [ "$AIENG" = 1 ]; then
+  rm -rf ai "$HOME/.cache/fastvideo"
+  echo "✓ ai/ 와 ~/.cache/fastvideo 삭제"
 fi
 
 if [ -n "$OLLAMA_MODEL" ]; then

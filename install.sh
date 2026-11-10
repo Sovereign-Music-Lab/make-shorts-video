@@ -74,7 +74,7 @@ else
   .venv/bin/python -m pip install -q --upgrade pip
   .venv/bin/python -m pip install -q -r requirements.txt
 fi
-chmod +x mkshort uninstall.sh 2>/dev/null || true
+chmod +x mkshort mkmv uninstall.sh install_ai.sh tools/upscale.sh 2>/dev/null || true
 
 # ---------------------------------------------------------------- 4. Ollama (optional)
 say "4/4 Ollama (선택: 로컬 LLM으로 대본 자동 작성)"
@@ -96,4 +96,6 @@ cat <<'EOF'
 설치 끝. 바로 해보기:
   ./mkshort make demo --from templeos          # 예제 대본으로 영상 만들기
   ./mkshort make my1 --topic "주제를 한 줄로"     # Ollama가 대본 작성
+  ./mkmv make mvdemo --demo-song                 # 가로 뮤직비디오 (데모 곡)
+  ./install_ai.sh                                # (선택) 로컬 AI 실사 클립 엔진, Apple Silicon
 EOF

@@ -1,7 +1,8 @@
 # make-shorts-video
 
-한국어 **팩트 쇼츠**(세로 1080×1920)를 내 컴퓨터에서 만드는 도구입니다.
-대본 → 남성 나레이션 → 배경음악 → 모션그래픽 렌더까지 명령 하나로 끝납니다.
+한국어 **팩트 쇼츠**(세로 1080×1920)와 **뮤직비디오**(가로 1920×1080)를 내 컴퓨터에서 만드는 도구입니다.
+대본 → 남성 나레이션 → 배경음악 → 모션그래픽 렌더까지 명령 하나로 끝납니다. (`./mkshort`)
+뮤직비디오는 내 곡을 분석해 비트에 맞춘 모션그래픽 + 로컬 AI 실사 클립(720p → 1080p 업스케일)으로 만듭니다. (`./mkmv`)
 
 - 대본은 **Claude Code** 또는 **Ollama(로컬 LLM)** 가 쓰거나, 직접 쓸 수 있습니다.
 - 나레이션: edge-tts 신경망 음성 (기본 남성 `ko-KR-InJoonNeural`, 무료·API 키 없음, 인터넷 필요)
@@ -40,7 +41,20 @@ cd make-shorts-video
 
 ```bash
 ./mkshort doctor
+./mkmv doctor
 ```
+
+### (선택) 뮤직비디오용 로컬 AI 실사 영상 엔진 — Apple Silicon 전용
+
+```bash
+./install_ai.sh                # FastVideo(MLX) + 모델 FastMetal-5B-QAD (~20 GB, 이어받기 가능)
+./install_ai.sh --skip-model   # 코드·환경만 먼저, 모델은 나중에
+```
+
+- 모두 `ai/` 폴더에 설치됩니다 (git 제외). 디스크 여유가 모자라면 받기 전에 멈춥니다.
+- 1280×704 실사 클립(5초)을 만들고 `ffmpeg`로 1920×1080 업스케일합니다.
+- 공개 자료 기준 720p 생성 피크 메모리 약 9 GB, 5초 클립 수 분 (기기마다 다름). 24 GB Mac에서는 큰 Ollama 모델을 `ollama stop` 으로 내리고 생성하세요.
+- 이 엔진 없이도 뮤직비디오(모션그래픽)는 만들 수 있습니다.
 
 ---
 
@@ -112,6 +126,34 @@ ANTHROPIC_AUTH_TOKEN=ollama ANTHROPIC_API_KEY="" ANTHROPIC_BASE_URL=http://local
 
 `lines.txt` 를 고치면 `voice → music → render` 순서로 다시 실행하세요 (타이밍이 바뀝니다).
 
+### E. 뮤직비디오 (가로 1920×1080, `./mkmv`)
+
+```bash
+./mkmv make demo --demo-song                                   # 데모 곡으로 바로 확인
+./mkmv make mysong --song ~/Music/mysong.wav --title "제목" --artist "이름"   # 내 곡 → 모션그래픽 MV
+./mkmv make mysong --song ~/Music/mysong.wav --plan --concept "새벽 도시, 네온"  # + Ollama 연출 계획
+./mkmv make mysong --song ~/Music/mysong.wav --plan --clips    # + 로컬 AI 실사 클립 (install_ai.sh 필요)
+```
+
+한 단계씩:
+
+```bash
+./mkmv new mysong --song mysong.wav --title "제목" --artist "이름"   # 음원 복사 + BPM/비트/에너지 분석 + 구간 초안
+./mkmv analyze mysong --bpm 128 --draft --bars 4    # BPM을 알면 지정, 구간을 4마디 단위로 다시
+./mkmv lyrics mysong --file lyrics.lrc              # 가사: LRC([01:23.45] 가사) 또는 일반 텍스트(균등 배치)
+./mkmv plan mysong --llm ollama --concept "바다, 일출" --max-clips 6   # 구간별 연출 + AI 클립 프롬프트
+./mkmv clips mysong                                 # AI 720p 생성 → 1080p 업스케일 → 구간에 연결
+./mkmv stills mysong                                # 구간별 스틸 시트
+./mkmv render mysong --draft                        # 960x540 빠른 확인
+./mkmv render mysong                                # 최종 1920x1080 → projects/mysong/out/mysong.mp4
+```
+
+- 연출 계획은 `projects/<n>/data/mv.json` 에 저장됩니다. 직접 고쳐도 됩니다.
+- 구간 종류: `title` `visualizer`(스펙트럼) `pulse`(비트 링) `lyrics`(가사 크게) `text`(비트마다 단어) `clip`(실사 영상) `credits`
+- 테마: `neon` `gold` `mono` `sunset`
+- `clip` 구간에 내가 찍은 영상을 쓰려면 `public/clips/` 에 넣고 `"clip": "clips/파일.mp4", "clipSeconds": 길이` 를 적으세요.
+- AI 클립 프롬프트는 실존 인물·로고를 피하도록 계획 단계에서 제한합니다.
+
 ### 명령어 요약
 
 | 명령 | 설명 |
@@ -127,6 +169,8 @@ ANTHROPIC_AUTH_TOKEN=ollama ANTHROPIC_API_KEY="" ANTHROPIC_BASE_URL=http://local
 | `./mkshort render <n> [--2k]` | MP4 렌더 |
 | `./mkshort studio <n>` | Remotion Studio 미리보기 |
 | `./mkshort list` / `./mkshort rm <n>` | 목록 / 삭제 |
+| `./mkmv make <n> --song F [--plan] [--clips]` | 뮤직비디오 전체 루틴 |
+| `./mkmv new / analyze / lyrics / plan / clips / stills / render / studio` | 뮤직비디오 단계별 |
 
 ### 장면(scenes.json) 형식
 
@@ -156,6 +200,7 @@ ANTHROPIC_AUTH_TOKEN=ollama ANTHROPIC_API_KEY="" ANTHROPIC_BASE_URL=http://local
 ./uninstall.sh                         # node_modules/, .venv/ 삭제 (만든 영상 projects/ 는 유지)
 ./uninstall.sh --projects              # 만든 영상까지 삭제 (확인 질문)
 ./uninstall.sh --ollama-model gemma4:e4b-mlx   # 받은 Ollama 모델도 삭제
+./uninstall.sh --ai                    # 로컬 AI 영상 엔진(ai/, 약 22 GB)과 프롬프트 캐시 삭제
 cd .. && rm -rf make-shorts-video      # 폴더째 완전 삭제
 ```
 

@@ -20,3 +20,6 @@ out/
 .DS_Store
 .idea/
 .vscode/
+
+# optional local AI clip engine (install_ai.sh): code clone, venv, 20 GB model
+ai/

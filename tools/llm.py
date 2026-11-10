@@ -126,6 +126,10 @@ def ollama_available():
 
 
 def generate_ollama(prompt, model=None, temperature=0.4):
+    return ollama_json(SYSTEM, prompt, SCHEMA, model, temperature)
+
+
+def ollama_json(system, prompt, schema, model=None, temperature=0.4):
     model = model or DEFAULT_OLLAMA_MODEL
     models = ollama_available()
     if models is None:
@@ -135,8 +139,8 @@ def generate_ollama(prompt, model=None, temperature=0.4):
                            f"설치된 모델: {', '.join(models) or '(없음)'}")
     body = {
         "model": model,
-        "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt}],
-        "format": SCHEMA,
+        "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}],
+        "format": schema,
         "stream": False,
         "think": False,
         "options": {"temperature": temperature, "num_ctx": 8192},
@@ -160,10 +164,14 @@ def generate_ollama(prompt, model=None, temperature=0.4):
 
 
 def generate_claude(prompt, model=None):
+    return claude_json(SYSTEM, prompt + "\n\n사실은 웹에서 확인한 것만 쓰고, 출처를 facts에 적어라. 최종 답은 JSON 객체 하나만.", model)
+
+
+def claude_json(system, prompt, model=None):
     exe = shutil.which("claude")
     if not exe:
         raise RuntimeError("Claude Code CLI(`claude`)를 찾을 수 없습니다. https://claude.com/claude-code 에서 설치하세요.")
-    full = SYSTEM + "\n\n" + prompt + "\n\n사실은 웹에서 확인한 것만 쓰고, 출처를 facts에 적어라. 최종 답은 JSON 객체 하나만."
+    full = system + "\n\n" + prompt
     cmd = [exe, "-p", full, "--output-format", "json"]
     if model:
         cmd += ["--model", model]
