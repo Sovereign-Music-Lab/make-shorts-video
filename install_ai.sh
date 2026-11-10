@@ -73,12 +73,24 @@ else
     exit 1
   fi
   if ask "  Hugging Face에서 $MODEL_ID 를 받을까요? (중단해도 이어받기 됩니다)"; then
-    ai/.venv/bin/python - "$MODEL_ID" "$MODEL_DIR" <<'PY'
+    # Plain HTTP (Xet off): partial files keep one fixed name and resume with Range requests.
+    # The Xet path writes randomly named temp files that never resume and can stall silently.
+    export HF_HUB_DISABLE_XET=1 HF_HUB_DOWNLOAD_TIMEOUT=60
+    dl="$MODEL_DIR/.cache/huggingface/download"
+    [ -d "$dl" ] && find -E "$dl" -regex '.*\.[0-9a-f]{64}\.[0-9a-f]{8}\.incomplete' -delete 2>/dev/null || true
+    ok=0
+    for attempt in 1 2 3 4 5 6; do
+      if ai/.venv/bin/python - "$MODEL_ID" "$MODEL_DIR" <<'PY'
 import sys
 from huggingface_hub import snapshot_download
-snapshot_download(sys.argv[1], local_dir=sys.argv[2])
+snapshot_download(sys.argv[1], local_dir=sys.argv[2], max_workers=4)
 print("  ✓ 모델 준비 완료:", sys.argv[2])
 PY
+      then ok=1; break; fi
+      echo "  ! 다운로드가 끊겼습니다. 10초 뒤 이어받기 ($attempt/6)"
+      sleep 10
+    done
+    [ "$ok" = 1 ] || { echo "  ✗ 모델 다운로드 실패. 네트워크 확인 후 ./install_ai.sh 를 다시 실행하세요 (이어받기 됩니다)." >&2; exit 1; }
   fi
 fi
 
